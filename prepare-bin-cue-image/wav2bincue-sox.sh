@@ -113,17 +113,22 @@ for file in *.wav; do
   ((index++))
 done
 
-# change CUE file encoding to Windows ANSI
-iconv -f utf8 -t Windows-1250 "$OUTPUT_CUE" > "$OUTPUT_CUE.windows-1250"
-iconv -f utf8 -t utf16 "$OUTPUT_CUE" > "$OUTPUT_CUE.utf16"
-#mv "$OUTPUT_CUE.ansi" "$OUTPUT_CUE"
+# change CUE file encoding to Windows ANSI, ISO and UTF16
+CUE_WINDOWS=${MASTER_CUE_FILENAME%.cue}.windows-1250.cue
+CUE_UTF16=${MASTER_CUE_FILENAME%.cue}.utf16.cue
+CUE_ANSI=${MASTER_CUE_FILENAME%.cue}.ansi.cue
+
+iconv -f utf8 -t Windows-1250 "$OUTPUT_CUE" > "$CUE_WINDOWS"
+iconv -f utf8 -t utf16 "$OUTPUT_CUE" > "$CUE_UTF16"
+iconv -f utf8 -t ansi "$OUTPUT_CUE" > "$CUE_ANSI"
+
 
 # prepare zip package with CUE/BIN and MD5 sum
 TODAY=$(date +%Y%m%d)
 ZIP_PACKAGE="$OUTPUT_FILENAME"-$TODAY.zip
 
 cd "$OUTPUT_DIR" && rm -vf "$ZIP_PACKAGE" && \
-zip "$ZIP_PACKAGE" "$MASTER_BIN_FILENAME" "$MASTER_CUE_FILENAME" "$MASTER_CUE_FILENAME.windows-1250" "$MASTER_CUE_FILENAME.utf16" && \
+zip "$ZIP_PACKAGE" "$MASTER_BIN_FILENAME" "$MASTER_CUE_FILENAME" "$CUE_WINDOWS" "$CUE_UTF16" "$CUE_ANSI" && \
 md5sum "$ZIP_PACKAGE" > "$ZIP_PACKAGE".md5
 
 cd "$ROOT_DIR"
