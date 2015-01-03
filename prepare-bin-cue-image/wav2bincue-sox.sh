@@ -23,7 +23,7 @@ SOX_FLAGS="\-c 2 -e signed-integer -b 16 -r 44100"
 PERFORMER="Kisiel & Me?How?"
 ALBUM_TITLE="Po drugiej stronie srebra"
 
-PERFORMER_DASH=$(echo $PERFORMER | tr ' ' '-')
+PERFORMER_DASH=$(echo $PERFORMER | tr ' ' '-' | tr '?' '_')
 ALBUM_TITLE_DASH=$(echo $ALBUM_TITLE | tr ' ' '-')
 
 #output_files
@@ -93,8 +93,8 @@ index=1; decimal=00; minute_seconds=00:00; total_duration=0;
 
 # get BIN file filename
 # generate CD-TEXT information
-echo "PERFORMER $PERFORMER\n
-TITLE $ALBUM_TITLE\n
+echo -e "PERFORMER $PERFORMER
+TITLE $ALBUM_TITLE
 FILE $MASTER_BIN_FILENAME BINARY" >"$OUTPUT_CUE"
 
 cd "$INPUT_DIR"
@@ -113,15 +113,21 @@ for file in *.wav; do
   ((index++))
 done
 
+# change CUE file encoding to Windows ANSI
+iconv -f utf8 -t Windows-1250 "$OUTPUT_CUE" > "$OUTPUT_CUE.windows-1250"
+iconv -f utf8 -t utf16 "$OUTPUT_CUE" > "$OUTPUT_CUE.utf16"
+#mv "$OUTPUT_CUE.ansi" "$OUTPUT_CUE"
+
 # prepare zip package with CUE/BIN and MD5 sum
 TODAY=$(date +%Y%m%d)
 ZIP_PACKAGE="$OUTPUT_FILENAME"-$TODAY.zip
 
 cd "$OUTPUT_DIR" && rm -vf "$ZIP_PACKAGE" && \
-zip "$ZIP_PACKAGE" "$MASTER_BIN_FILENAME" "$MASTER_CUE_FILENAME" && \
+zip "$ZIP_PACKAGE" "$MASTER_BIN_FILENAME" "$MASTER_CUE_FILENAME" "$MASTER_CUE_FILENAME.windows-1250" "$MASTER_CUE_FILENAME.utf16" && \
 md5sum "$ZIP_PACKAGE" > "$ZIP_PACKAGE".md5
 
 cd "$ROOT_DIR"
+rm -rf "$TMP_DIR"
 
 # testing
 # convert BIN file to WAV file
