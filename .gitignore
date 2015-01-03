@@ -1,0 +1,10 @@
+*test/*
+*tmp/*
+*output/*
+*.wav
+*.mp3
+*.raw
+*.flac
+*.aiff
+*.bin
+*.cue
