@@ -1,4 +1,5 @@
 audio_scripts
 =============
 
-Set of python scripts for audio processing
+Various scripts for audio processing.
+Languages python. perl, C++ and bash.
