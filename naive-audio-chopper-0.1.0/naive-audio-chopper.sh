@@ -18,7 +18,8 @@ else
 	fi
 	
 	input="$1"
-	filename=$(basename $input .wav);
+	extension="${input##*.}"
+	filename=$(basename "$input" ."$extension");
 	output_dir="$2/$TODAY-$filename"
 fi
 
@@ -31,20 +32,24 @@ mkdir -p $output_dir;
 
 if [ -z "$3" ]; then
 	segment_duration=30
+else
+	segment_duration=$3
 fi
 
 if [ -z "$4" ]; then
 	startp=0;
+else
+	startp=$4
 fi
 
 if [ -z "$5" ]; then
 	endp=0;
+else
+	endp=$5
 fi
 
 duration=$(sox "$input" -n stat 2>&1 | grep "Length" | tr -d ' ' | cut -d  ':' -f 2);
 #echo duration $duration;
-
-startp=0
 
 for i in {1..10}; do
 	endp=$(echo "$startp $segment_duration" | awk '{print $1+$2}');
@@ -64,3 +69,5 @@ for i in {1..10}; do
 	echo "start $startp end $endp"
 	startp=$(echo "$endp $OVERLAP" | awk '{print $1-$2}');
 done;
+
+rm -vf "$input"
